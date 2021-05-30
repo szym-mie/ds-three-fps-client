@@ -1,0 +1,33 @@
+body, canvas { margin: 0; padding: 0; }
+canvas { z-index: 1 }
+div#loading_screen {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #352020;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1s ease-out;
+    z-index: 2;
+    color: #c0b0a0;
+}
+
+div#crosshair {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    width: 4px;
+    height: 4px;
+    background-color: #c0b0a0;
+    border: 0 solid #c0b0a0;
+    border-radius: 5px;
+    z-index: 3;
+}
+
+h1 {
+    font-family: Bahnschrift, monospace;
+    color: #c0b0a0;
+}

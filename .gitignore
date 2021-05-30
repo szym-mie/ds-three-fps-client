@@ -1,0 +1,6 @@
+# project setting
+.idea
+*.iml
+
+# just too much files
+node_modules
