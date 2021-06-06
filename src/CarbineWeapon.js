@@ -21,6 +21,8 @@ export default class CarbineWeapon extends Weapon {
         this.animator.replace("idle");
         this.animator.loop("shoot", LoopOnce, 1);
 
+        this.cooldown = 0;
+
         console.log(this.animator.actions);
 
         this.animator.loop("reload_loaded", LoopOnce, 1);
@@ -40,14 +42,17 @@ export default class CarbineWeapon extends Weapon {
     }
 
     shoot() {
-        this.animator.play("shoot");
-        this.animator.action_weight("shoot", 1);
-        this.particles.spawn(this);
+        if (!this.cooldown) {
+            this.animator.play("shoot");
+            this.animator.action_weight("shoot", 1);
+            this.particles.spawn(this);
+            this.cooldown = 5;
 
-        const ent = super.shoot();
-        try {
-            ent.wound(5);
-        } catch {}
+            const ent = super.shoot();
+            try {
+                ent.wound(5);
+            } catch {}
+        }
     }
 
     finished(cb) {
@@ -64,5 +69,11 @@ export default class CarbineWeapon extends Weapon {
         this.animator.play("reload_empty");
         this.animator.replace("reload_empty");
         console.log("reload_empty");
+    }
+
+    update(dT) {
+        if (this.cooldown) this.cooldown--;
+        this.animator.update(dT);
+        this.particles.update();
     }
 }

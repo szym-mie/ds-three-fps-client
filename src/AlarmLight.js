@@ -1,15 +1,15 @@
 import CeilLight from "./CeilLight";
 
 export default class AlarmLight extends CeilLight {
-    constructor(scene, color, rot_speed) {
-        super(scene, color, .5, 40);
+    constructor(scene, color, rot_speed, quality) {
+        super(scene, color, 1, 40, Math.PI/3, .1, 0, quality);
 
         this.rotation_speed = rot_speed;
         this.c_radius = 100;
     }
 
     clone() {
-        return new AlarmLight(this.scene, this.obj.color, this.rotation_speed);
+        return new AlarmLight(this.scene, this.obj.color, this.rotation_speed, this.quality);
     }
 
     tick(t, _) {

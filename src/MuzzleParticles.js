@@ -9,8 +9,8 @@ export default class MuzzleParticles {
 
         this.offset = offset;
         const texture_loader = new TextureLoader();
-        this.fire_tex = texture_loader.load("http://localhost:8080/texs/fire1.png");
-        this.smoke_tex = texture_loader.load("http://localhost:8080/texs/smoke1.png");
+        this.fire_tex = texture_loader.load("/texs/fire1.png");
+        this.smoke_tex = texture_loader.load("/texs/smoke1.png");
 
         this.fire_mat = new SpriteMaterial({map: this.fire_tex, transparent: true});
         this.fire = new Sprite(this.fire_mat);
@@ -61,7 +61,7 @@ export default class MuzzleParticles {
     }
 
     update() {
-        this.fire.material.opacity = Math.min(...this.smokes.map(smoke => smoke.time)) < 2 ? .5 : 0;
+        this.fire.material.opacity = Math.min(...this.smokes.map(smoke => smoke.time)) < 1 ? .5 : 0;
         for (const smoke of this.smokes) {
             for (let i = 0; i < this.salvo_sprites; i++) {
                 const sprite = smoke.group.children[i];

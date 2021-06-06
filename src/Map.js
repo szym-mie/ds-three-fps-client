@@ -3,6 +3,8 @@ export default class Map {
         this.name = "";
         this.cols = cols;
         this.rows = rows;
+        this.start = 0;
+        this.score = 0;
 
         this.tiles = new Uint8Array(this.cols * this.rows);
     }
@@ -21,6 +23,7 @@ export default class Map {
         this.cols = json.cols;
         this.rows = json.rows;
         this.tiles = new Uint8Array(json.tiles);
+        this.start = this.tiles.findIndex(tile => tile === 1);
     }
 
     at (pos) {

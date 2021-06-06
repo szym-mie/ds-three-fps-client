@@ -12,7 +12,7 @@ import {
     Vector3,
     AmbientLight,
     DirectionalLight,
-    WebGLRenderer
+    WebGLRenderer, CubeTextureLoader
 } from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { TileTypes } from "./TileTypes";
@@ -30,8 +30,19 @@ import CarbineWeapon from "./CarbineWeapon";
 export default class BoxRenderer {
     constructor (scene, map, dom) {
         this.dom = dom;
+        this.score_dom = document.getElementById("score");
         this.scene = scene;
         this.map = map;
+
+        const params = new URLSearchParams(window.location.search);
+        const shadowq = parseInt(params.get("shadowq"));
+        this.config = {
+            noshadow: !!params.get("noshadow"),
+            shadowq: isNaN(shadowq) ? 1 : shadowq,
+            ceiling: !!params.get("ceiling")
+        };
+
+        console.log(this.config);
 
         this.pre = this.map.walls();
 
@@ -41,8 +52,19 @@ export default class BoxRenderer {
 
         this.composer = new EffectComposer( this.renderer );
 
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = PCFSoftShadowMap;
+        const cubemap_loader = new CubeTextureLoader();
+        cubemap_loader.setPath("/texs/skybox1/");
+
+        this.scene.background = cubemap_loader.load([
+            "px.png", "nx.png",
+            "pz.png", "nz.png",
+            "py.png", "ny.png"
+        ]);
+
+        if (!this.config.noshadow) {
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = PCFSoftShadowMap;
+        }
 
         this.renderer.setClearColor(0xffffff);
 
@@ -100,10 +122,10 @@ export default class BoxRenderer {
         this.tex_loader = new TextureLoader();
 
         this.no_tex = {
-            diff: this.tex_loader.load("http://localhost:8080/texs/no_tex_diff.jpg"),
-            norm: this.tex_loader.load("http://localhost:8080/texs/no_tex_norm.jpg"),
-            ao: this.tex_loader.load("http://localhost:8080/texs/no_tex_ao.jpg"),
-            emsv: this.tex_loader.load("http://localhost:8080/texs/no_tex_emsv.jpg")
+            diff: this.tex_loader.load("/texs/no_tex_diff.jpg"),
+            norm: this.tex_loader.load("/texs/no_tex_norm.jpg"),
+            ao: this.tex_loader.load("/texs/no_tex_ao.jpg"),
+            emsv: this.tex_loader.load("/texs/no_tex_emsv.jpg")
         };
 
         this.textures = [];
@@ -113,46 +135,46 @@ export default class BoxRenderer {
                 this.textures.push(this.no_tex);
             else
                 this.textures.push({
-                    diff: this.tex_loader.load("http://localhost:8080/texs/" + type + "_diff.jpg"),
-                    norm: this.tex_loader.load("http://localhost:8080/texs/" + type + "_norm.jpg"),
-                    ao: this.tex_loader.load("http://localhost:8080/texs/" + type + "_ao.jpg"),
-                    emsv: this.tex_loader.load("http://localhost:8080/texs/" + type + "_emsv.jpg")
+                    diff: this.tex_loader.load("/texs/" + type + "_diff.jpg"),
+                    norm: this.tex_loader.load("/texs/" + type + "_norm.jpg"),
+                    ao: this.tex_loader.load("/texs/" + type + "_ao.jpg"),
+                    emsv: this.tex_loader.load("/texs/" + type + "_emsv.jpg")
                 });
         }
 
         this.textures[256] = {
-            diff: this.tex_loader.load("http://localhost:8080/texs/floor_diff.jpg"),
-            norm: this.tex_loader.load("http://localhost:8080/texs/floor_norm.jpg"),
-            ao: this.tex_loader.load("http://localhost:8080/texs/floor_ao.jpg")
+            diff: this.tex_loader.load("/texs/floor_diff.jpg"),
+            norm: this.tex_loader.load("/texs/floor_norm.jpg"),
+            ao: this.tex_loader.load("/texs/floor_ao.jpg")
         };
 
-        this.textures[256].diff.repeat.set(10, 10);
+        this.textures[256].diff.repeat.set(this.map.cols, this.map.rows);
         this.textures[256].diff.wrapS = RepeatWrapping;
         this.textures[256].diff.wrapT = RepeatWrapping;
 
-        this.textures[256].norm.repeat.set(10, 10);
+        this.textures[256].norm.repeat.set(this.map.cols, this.map.rows);
         this.textures[256].norm.wrapS = RepeatWrapping;
         this.textures[256].norm.wrapT = RepeatWrapping;
 
-        this.textures[256].ao.repeat.set(10, 10);
+        this.textures[256].ao.repeat.set(this.map.cols, this.map.rows);
         this.textures[256].ao.wrapS = RepeatWrapping;
         this.textures[256].ao.wrapT = RepeatWrapping;
 
         this.textures[257] = {
-            diff: this.tex_loader.load("http://localhost:8080/texs/ceil_diff.jpg"),
-            norm: this.tex_loader.load("http://localhost:8080/texs/ceil_norm.jpg"),
-            ao: this.tex_loader.load("http://localhost:8080/texs/ceil_ao.jpg")
+            diff: this.tex_loader.load("/texs/ceil_diff.jpg"),
+            norm: this.tex_loader.load("/texs/ceil_norm.jpg"),
+            ao: this.tex_loader.load("/texs/ceil_ao.jpg")
         };
 
-        this.textures[257].diff.repeat.set(10, 10);
+        this.textures[257].diff.repeat.set(this.map.cols, this.map.rows);
         this.textures[257].diff.wrapS = RepeatWrapping;
         this.textures[257].diff.wrapT = RepeatWrapping;
 
-        this.textures[257].norm.repeat.set(10, 10);
+        this.textures[257].norm.repeat.set(this.map.cols, this.map.rows);
         this.textures[257].norm.wrapS = RepeatWrapping;
         this.textures[257].norm.wrapT = RepeatWrapping;
 
-        this.textures[257].ao.repeat.set(10, 10);
+        this.textures[257].ao.repeat.set(this.map.cols, this.map.rows);
         this.textures[257].ao.wrapS = RepeatWrapping;
         this.textures[257].ao.wrapT = RepeatWrapping;
 
@@ -212,12 +234,14 @@ export default class BoxRenderer {
         this.ceil.castShadow = true;
 
         this.scene.add(this.floor);
-        this.scene.add(this.ceil);
+        if (this.config.ceiling) {
+            this.scene.add(this.ceil);
+        }
         for (const box of this.boxes) {
             this.scene.add(box);
         }
 
-        this.sun = new DirectionalLight(0xe0e0ff, 1);
+        this.sun = new DirectionalLight(0xe0e0ff, .7);
         this.sun.castShadow = true;
         this.sun.shadow.mapSize.width = 2048;
         this.sun.shadow.mapSize.height = 2048;
@@ -225,27 +249,29 @@ export default class BoxRenderer {
         this.sun.shadow.camera.right = 100;
         this.sun.shadow.camera.bottom = -100;
         this.sun.shadow.camera.top = 100;
-        this.sun.shadow.camera.near = 50;
+        this.sun.shadow.camera.near = 20;
         this.sun.shadow.camera.far = 1000;
-        this.sun.shadow.bias = 0.001;
+        this.sun.shadow.bias = 0.0001;
 
-        this.sun.position.set(50, 50, 50);
-        this.ambient = new AmbientLight(0xefefff, .1);
+        this.ambient = new AmbientLight(0xefefff, .3);
 
         this.scene.add(this.sun);
         this.scene.add(this.ambient);
 
         this.camera = new Camera(this.renderer);
-        this.player = new Player(scene, map, this.camera.camera, 0, 1);
+        const p_start = this.map.coord(this.map.start);
+        this.player = new Player(scene, map, this.camera.camera, p_start[0], p_start[1]);
+
+        this.sun.target = this.player.obj;
 
         this.T = 0;
         this.dT = 0;
 
         this.model_man = new ModelManager(() => { console.log("load complete", this.player); this.object_init(); });
-        this.model_man.add("ammobox", "http://localhost:8080/mdls/ammobox.glb");
-        this.model_man.add("treasure", "http://localhost:8080/mdls/treasure.glb");
-        this.model_man.add("light_enemy", "http://localhost:8080/mdls/plane.glb");
-        this.model_man.add("carbine_hand", "http://localhost:8080/mdls/carbine_hand.glb");
+        this.model_man.add("ammobox", "/mdls/ammobox.glb");
+        this.model_man.add("treasure", "/mdls/treasure.glb");
+        this.model_man.add("light_enemy", "/mdls/plane.glb");
+        this.model_man.add("carbine_hand", "/mdls/carbine_hand.glb");
         this.model_man.load();
     }
 
@@ -257,10 +283,11 @@ export default class BoxRenderer {
     }
 
     object_init() {
+        const q = this.config.shadowq;
         this.protos = {
-            8:   new CeilLight(this.scene, 0xf0f0c0, 1, 5, Math.PI / 3, .5, .5),
-            9:   new CeilLight(this.scene, 0xdde0e8, 3, 50, Math.PI / 2.2, .2, .4),
-            10:  new AlarmLight(this.scene, 0xd01010, 2),
+            8:   new CeilLight(this.scene, 0xf0f0c0, 1, 5, Math.PI / 3, .5, .5, q),
+            9:   new CeilLight(this.scene, 0xdde0e8, 3, 50, Math.PI / 2.2, .2, .4, q),
+            10:  new AlarmLight(this.scene, 0xd01010, 2, q),
             16:  new LightEnemy(this.scene, this.player, this.map, this.model_man, 1, 1),
             24:  new Treasure(this.scene, this.model_man),
             32:  new Ammobox(this.scene, this.model_man),
@@ -329,6 +356,9 @@ export default class BoxRenderer {
                 }
             }
         }
+        this.score_dom.innerHTML = `<h3>score: <b>${this.map.score}</b></h3>`;
+
+        this.sun.position.set(this.player.obj.position.x+30, 60, this.player.obj.position.z+50);
 
         this.player.tick(T, dT);
         this.renderer.render(scene, camera);

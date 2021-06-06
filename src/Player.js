@@ -11,7 +11,7 @@ export default class Player extends MapEntity {
             d: false,
             r: false,
             Shift: false,
-            Control: false
+            ' ': false
         };
         this.movements = {
             w: Math.PI,
@@ -41,9 +41,6 @@ export default class Player extends MapEntity {
             if (['w', 's', 'a', 'd'].includes(k)) {
                 const none = !(this.keys.w || this.keys.s || this.keys.a || this.keys.d);
                 if (none && !this.keys[k] && !this.busy) this.weapon.walk();
-            }
-            if (k === 'Control') {
-                this.shoot();
             }
             if (k === 'r') {
                 this.reload();
@@ -84,6 +81,15 @@ export default class Player extends MapEntity {
         if (strafe && this.keys.a) avg_direction += this.movements.a;
         if (strafe && this.keys.d) avg_direction += this.movements.d;
 
+        if (this.keys.a && this.keys.s) {
+            console.log("A&S");
+            avg_direction = Math.PI*7/2;
+        }
+
+        if (this.keys[" "] && !this.weapon.cooldown) {
+            this.shoot();
+        }
+
         const len = ((this.keys.w || this.keys.s) + (this.keys.a || this.keys.d));
         avg_direction /= isNaN(len) ? 1 : len;
 
@@ -92,8 +98,7 @@ export default class Player extends MapEntity {
         super.tick(t);
 
         if (this.weapon) {
-            this.weapon.animator.update(dt);
-            this.weapon.particles.update();
+            this.weapon.update(dt);
         }
     }
 

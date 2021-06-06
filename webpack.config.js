@@ -4,7 +4,7 @@ module.exports = {
     // output: {
     //     filename: 'bundle.js'
     // },
-    mode: 'development',
+    mode: 'production',
     devServer: {
         port: 7070
     },

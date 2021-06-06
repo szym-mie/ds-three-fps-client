@@ -24,7 +24,7 @@ export default class EditorBar {
             rows: 10
         }
 
-        this.maps = new MapStorage();
+        this.maps = new MapStorage("");
 
         this.show_status();
     }
@@ -40,7 +40,7 @@ export default class EditorBar {
     }
 
     level_test () {
-
+        window.location = "/game";
     }
 
     level_resize () {

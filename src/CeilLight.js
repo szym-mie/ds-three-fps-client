@@ -3,16 +3,18 @@ import { Object3D, SpotLight } from "three";
 
 export default class CeilLight extends MapObject {
     constructor (scene, color=0xf8f0d0, intensity=1, distance=5,
-                 angle=(Math.PI/3), penumbra=0, decay=1) {
+                 angle=(Math.PI/3), penumbra=0, decay=1, quality=2) {
         super(scene, new SpotLight(color, intensity, distance, angle, penumbra, decay));
         this.target = new Object3D();
 
         this.obj.castShadow = true;
-        this.obj.shadow.mapSize.width = 1024;
-        this.obj.shadow.mapSize.height = 1024;
+        const multiplier = Math.min(quality ? 2**(quality-1) : 0, 8)
+        this.obj.shadow.mapSize.width = 256*multiplier;
+        this.obj.shadow.mapSize.height = 256*multiplier;
         this.t_offset = Math.random();
         this.x_scale = Math.random()*.2;
         this.y_scale = Math.random()*.2;
+        this.quality = quality;
     }
 
     add () {
@@ -22,7 +24,7 @@ export default class CeilLight extends MapObject {
     }
 
     clone () {
-        return new CeilLight(this.scene, this.obj.color, this.obj.intensity, this.obj.distance, this.obj.angle, this.obj.penumbra, this.obj.decay);
+        return new CeilLight(this.scene, this.obj.color, this.obj.intensity, this.obj.distance, this.obj.angle, this.obj.penumbra, this.obj.decay, this.quality);
     }
 
     move (vec) {

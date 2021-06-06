@@ -11,7 +11,7 @@ div#loading_screen {
     justify-content: center;
     align-items: center;
     transition: opacity 1s ease-out;
-    z-index: 2;
+    z-index: 3;
     color: #c0b0a0;
 }
 
@@ -24,10 +24,17 @@ div#crosshair {
     background-color: #c0b0a0;
     border: 0 solid #c0b0a0;
     border-radius: 5px;
-    z-index: 3;
+    z-index: 4;
 }
 
-h1 {
+div#score {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2;
+}
+
+h1, h3 {
     font-family: Bahnschrift, monospace;
     color: #c0b0a0;
 }

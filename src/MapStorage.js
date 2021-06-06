@@ -46,9 +46,9 @@ export default class MapStorage {
             "pull",
             {},
             obj => {
-                console.log(new Map("", 0, 0).decode(obj));
                 const map_obj = new Map("", 0, 0);
                 map_obj.decode(obj);
+                console.log(map_obj);
                 map(map_obj);
                 msg(
                     "<b>Loaded \'" + map_obj.name + "\' map successfully.</b>\n",

@@ -9,6 +9,7 @@ export default class ServerConnection {
     }
 
     send (action, data, recv=json => { console.log(json); }, fail=err => { console.error(err); }) {
+        console.log(JSON.stringify(data));
         fetch(this.base_url + action, {
             method: this.method,
             headers: this.headers,

@@ -87,7 +87,6 @@ export default class LightEnemy extends MapEntity {
     }
 
     do_action(t) {
-        console.log(this.state)
         switch (this.state) {
             case "idle":
                 break;
@@ -104,7 +103,6 @@ export default class LightEnemy extends MapEntity {
                 this.fly(t);
                 break;
             case "track":
-                console.log("- tracking");
                 this.track();
                 break;
             default:
@@ -198,6 +196,7 @@ export default class LightEnemy extends MapEntity {
                 this.animator.play("death");
                 this.animator.replace("death");
                 this.state = "dead";
+                this.map.score+=100;
                 this.state_duration = 784000;
             } else {
                 this.track_begin();
