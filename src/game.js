@@ -1,10 +1,9 @@
 import BoxRenderer from "./BoxRenderer";
 import MapStorage from "./MapStorage";
-import Map from "./Map";
 import {Scene, Vector2} from "three";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass";
-import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 require("./game.css");
 
 // const map = new Map("", 10, 10);
@@ -49,7 +48,11 @@ require("./game.css");
 // }
 
 const maps = new MapStorage("");
-maps.pull(() => {}, m => {
+const params = new URLSearchParams(window.location.search);
+const map_name = params.get("map");
+const pull_map = map_name !== null ? maps.pullByName.bind(maps, map_name) : maps.pullLatest.bind(maps);
+
+pull_map(() => {}, m => {
     const dom_root = document.body;
 
     const scene = new Scene();
@@ -58,7 +61,7 @@ maps.pull(() => {}, m => {
     const render_pass = new RenderPass(scene, renderer.camera.camera);
     const bloom_pass = new UnrealBloomPass(
         new Vector2( window.innerWidth, window.innerHeight ),
-        0.5, 0.5, 0.85);
+        1.5, 1.5, 0.85);
     const bokeh_pass = new BokehPass(scene, renderer.camera.camera, {
         focus: 1,
         aperture: 0.025,

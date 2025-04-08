@@ -10,9 +10,9 @@ import {
     BufferAttribute,
     Matrix4,
     Vector3,
-    AmbientLight,
     DirectionalLight,
-    WebGLRenderer, CubeTextureLoader
+    WebGLRenderer, CubeTextureLoader,
+    HemisphereLight
 } from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { TileTypes } from "./TileTypes";
@@ -31,6 +31,7 @@ export default class BoxRenderer {
     constructor (scene, map, dom) {
         this.dom = dom;
         this.score_dom = document.getElementById("score");
+        this.mag_dom = document.getElementById("mag");
         this.scene = scene;
         this.map = map;
 
@@ -241,7 +242,7 @@ export default class BoxRenderer {
             this.scene.add(box);
         }
 
-        this.sun = new DirectionalLight(0xe0e0ff, .7);
+        this.sun = new DirectionalLight(0xffffff);
         this.sun.castShadow = true;
         this.sun.shadow.mapSize.width = 2048;
         this.sun.shadow.mapSize.height = 2048;
@@ -253,10 +254,10 @@ export default class BoxRenderer {
         this.sun.shadow.camera.far = 1000;
         this.sun.shadow.bias = 0.0001;
 
-        this.ambient = new AmbientLight(0xefefff, .3);
+        this.hemi = new HemisphereLight(0x404040, 0x080820);
 
         this.scene.add(this.sun);
-        this.scene.add(this.ambient);
+        this.scene.add(this.hemi);
 
         this.camera = new Camera(this.renderer);
         const p_start = this.map.coord(this.map.start);
@@ -270,7 +271,7 @@ export default class BoxRenderer {
         this.model_man = new ModelManager(() => { console.log("load complete", this.player); this.object_init(); });
         this.model_man.add("ammobox", "/mdls/ammobox.glb");
         this.model_man.add("treasure", "/mdls/treasure.glb");
-        this.model_man.add("light_enemy", "/mdls/plane.glb");
+        this.model_man.add("light_enemy", "/mdls/plane.gltf");
         this.model_man.add("carbine_hand", "/mdls/carbine_hand.glb");
         this.model_man.load();
     }
@@ -311,13 +312,20 @@ export default class BoxRenderer {
         this.player.weapon = new CarbineWeapon(this.scene, this.objects, this.player, new Vector3(0.05,-0.05,-.15), this.model_man);
 
         this.scene.add(this.player.weapon.off);
-        setTimeout(() => { this.player.reload(); this.loading_end(); }, 500);
+        this.loading_msg("finalizing...");
+        setTimeout(() => { this.player.reload(); this.loading_end(); }, 1500);
+    }
+
+    loading_msg(text) {
+        try {
+            const lscr = document.getElementById("loading_screen");
+            lscr.children[0].innerText = text;
+        } catch {}        
     }
 
     loading_end() {
         try {
             const lscr = document.getElementById("loading_screen");
-            lscr.children[0].innerText = "finalizing...";
             lscr.style.display = "none";
         } catch {}
     }
@@ -356,7 +364,13 @@ export default class BoxRenderer {
                 }
             }
         }
-        this.score_dom.innerHTML = `<h3>score: <b>${this.map.score}</b></h3>`;
+        const player = this.player;
+        this.score_dom.innerHTML = `<h1>score: <b>${this.map.score}</b></h1>`;
+        if (player.busy === "reload_loaded" || player.busy === "reload_empty") {
+            this.mag_dom.innerHTML = `<h1><b>--/${player.ammo}</b></h1>`;
+        } else {
+            this.mag_dom.innerHTML = `<h1><b>${player.mag}/${player.ammo}</b></h1>`;
+        }
 
         this.sun.position.set(this.player.obj.position.x+30, 60, this.player.obj.position.z+50);
 

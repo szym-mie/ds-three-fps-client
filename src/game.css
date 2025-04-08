@@ -30,6 +30,13 @@ div#crosshair {
 div#score {
     position: absolute;
     bottom: 20px;
+    left: 20px;
+    z-index: 2;
+}
+
+div#mag {
+    position: absolute;
+    bottom: 20px;
     right: 20px;
     z-index: 2;
 }

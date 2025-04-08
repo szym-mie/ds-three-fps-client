@@ -1,6 +1,6 @@
 import MapEntity from "./MapEntity";
 import Animator from "./Animator";
-import {SkeletonUtils} from "three/examples/jsm/utils/SkeletonUtils";
+import * as SkeletonUtils from "three/addons/utils/SkeletonUtils";
 import {LoopOnce, Vector3} from "three";
 import MuzzleParticles from "./MuzzleParticles";
 

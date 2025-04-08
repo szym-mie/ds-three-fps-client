@@ -5,7 +5,7 @@ export default class EditorBar {
         this.map = map;
 
         this.dom = {
-            load: this._button_dom("load", this.level_load),
+            load: this._button_dom("load", this.open_level_load),
             save: this._button_dom("save", this.level_save),
             test: this._button_dom("test", this.level_test),
             name: this._text_input_dom("map name", "name"),
@@ -13,13 +13,15 @@ export default class EditorBar {
             cols: this._number_input_dom("10", "cols"),
             rows: this._number_input_dom("10", "rows"),
             status: this._button_dom("status ≡", this.show_status),
-            display: this._display_dom()
+            display: this._display_dom(),
+            maps: this._maps_dom()
         };
 
         this.params = {
-            name: "",
+            name: null,
             status_msg: [{ type: "note", msg: "<b>welcome to the editor</b>\n\nif you don't know something\nyou can press <b>[h]</b> for help.\n\nclick <b>status</b> to hide this display.\n"}],
             maps: [],
+            init: false,
             cols: 10,
             rows: 10
         }
@@ -29,9 +31,26 @@ export default class EditorBar {
         this.show_status();
     }
 
-    level_load () {
-        this.maps.pull(this.add_status.bind(this), function (map) {
-            console.log(map); this.map.from(map); console.log(this, this.map); }.bind(this));
+    open_level_load () {
+        this.params.init = false;
+        const is_shown = this.show_maps();
+        if (is_shown) {
+            this.maps.list(this.add_status.bind(this), function (maps) {
+                console.log("list");
+                this.params.maps = maps;
+                this.params.init = true;
+                this.update_maps();
+            }.bind(this));
+        }
+    }
+
+    level_load (name) {
+        this.show_maps();
+        this.maps.pullByName(name, this.add_status.bind(this), function (map) {
+            console.log(map); 
+            this.map.from(map); 
+            console.log(this, this.map); 
+        }.bind(this));
     }
 
     level_save () {
@@ -40,12 +59,36 @@ export default class EditorBar {
     }
 
     level_test () {
-        window.location = "/game";
+        console.log(this.map);
+        if (this.map.name.length === 0) {
+            this.add_status("saving before playing", "warn");
+            this.map.name = this.params.name;
+            this.maps.push(this.nav_game.bind(this), this.map);
+        } else {
+            this.nav_game()
+        }
+    }
+
+    nav_game () {
+        window.location = `/game?map=${this.map.name}`;
     }
 
     level_resize () {
         this.map.resize(this.params.cols, this.params.rows);
         console.log(this.map);
+    }
+
+    show_maps () {
+        if (this.dom.maps.className === "maps_hide") {
+            console.log("show");
+            this.update_maps();
+            this.dom.maps.className = "maps";
+            return true;
+        } else {
+            console.log("hide");
+            this.dom.maps.className = "maps_hide";
+            return false;
+        }
     }
 
     show_status () {
@@ -59,9 +102,31 @@ export default class EditorBar {
         }
     }
 
+    update_maps () {
+        let nodes = [];
+        if (this.params.init) {
+            for (const {name, updated} of this.params.maps) {
+                const date = new Date(updated);
+                const entry = document.createElement("pre");
+                entry.className = "map_entry";
+                entry.onclick = (_) => this.level_load.call(this, name);
+                entry.innerText = `${name} - updated ${date.toUTCString()}`;
+                nodes.push(entry);
+            }
+        } else {
+            const header = document.createElement("h3");
+            header.innerText = "loading...";
+            nodes.push(header);
+        }
+        this.dom.maps.innerHTML = "";
+        for (const node of nodes) {
+            this.dom.maps.appendChild(node);
+        }
+    }
+
     update_status () {
         let text = "";
-        for (const {type: type, msg: msg} of this.params.status_msg)
+        for (const {type, msg} of this.params.status_msg)
             text += `<em type=\"${type}\">${msg}</em>\n`;
         text += "<em type=\"note\">\n--- END OF MESSAGES ---</em>";
         this.dom.display.innerHTML = text;

@@ -20,13 +20,16 @@ export default class MuzzleParticles {
         this.smoke_mat = new SpriteMaterial({map: this.smoke_tex, transparent: true, opacity: 0});
         this.smokes = [];
 
-        this.salvo_sprites = 2;
+        this.salvo_sprites = 1;
     }
 
     spawn(weapon) {
+        console.log(weapon);
+        const dir = new Vector3();
+        weapon.obj.getWorldDirection(dir);
         const smoke = {
             time: 0,
-            velocity: weapon.obj.getWorldDirection(),
+            velocity: dir,
             group: new Group(),
             randoms: []
         }
@@ -67,14 +70,14 @@ export default class MuzzleParticles {
                 const sprite = smoke.group.children[i];
                 const random = smoke.randoms[i];
 
-                smoke.velocity.multiplyScalar(.9);
+                smoke.velocity.multiplyScalar(.8);
                 const velocity = smoke.velocity.clone().multiplyScalar((i+1)/this.salvo_sprites*.5);
 
                 sprite.position.sub(velocity);
-                sprite.material.opacity = Math.max((20-smoke.time)/50, 0);
+                sprite.material.opacity = Math.max(smoke.time <= 5 ? 1 - smoke.time * 0.18 : 0.1 - ((smoke.time -  5) * 0.01), 0) * 0.5;
                 sprite.material.rotation += random*(30-smoke.time)*.02;
                 const scale_time = smoke.time/60+.5;
-                sprite.scale.set(.5+scale_time, .5+scale_time ,1);
+                sprite.scale.set(.3+scale_time, .3+scale_time, 1);
             }
             if (smoke.time++ > 30) {
                 const unused = this.smokes.shift();

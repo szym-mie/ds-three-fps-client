@@ -6,7 +6,7 @@ import EditorView from "./EditorView";
 import EditorBar from "./EditorBar";
 import Map from "./Map";
 
-const map = new Map("NEWMAP", 10, 10);
+const map = new Map(null, 10, 10);
 
 const bar = new EditorBar(map);
 const view = new EditorView(map, 100);

@@ -8,15 +8,19 @@ export default class ServerConnection {
         }
     }
 
-    send (action, data, recv=json => { console.log(json); }, fail=err => { console.error(err); }) {
+    async send (action, data, recv=json => { console.log(json); }, fail=err => { console.error(err); }) {
         console.log(JSON.stringify(data));
-        fetch(this.base_url + action, {
-            method: this.method,
-            headers: this.headers,
-            body: JSON.stringify(data)
-        })
-            .then(res => res.text())
-            .then(data => { recv(JSON.parse(data)); })
-            .catch(err => { fail(err) });
+        try {
+            const res = await fetch(this.base_url + action, {
+                method: this.method,
+                headers: this.headers,
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) recv(await res.json());
+            else fail(await res.text());
+        } catch {
+            fail(err);
+        }
     }
 }

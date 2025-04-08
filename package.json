@@ -1,25 +1,24 @@
 {
-  "name": "three_fps_client",
+  "name": "ds-three-fps-client-neo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "watch": "webpack --progress --watch",
-    "server": "webpack serve --open",
-    "go": "webpack && webpack serve --open"
+    "serve": "webpack serve --open"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "css-loader": "^5.2.4",
-    "style-loader": "^2.0.0",
-    "three": "^0.127.0",
-    "webpack": "^5.33.2",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2"
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.3",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.99.2",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
-    "html-webpack-plugin": "^5.3.1"
+    "three": "^0.175.0"
   }
 }
